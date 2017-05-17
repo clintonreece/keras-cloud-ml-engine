@@ -408,7 +408,7 @@ You can check the [job status], where logs are also available.
 
 #### Acknowledgements
 
-I would like to thank Fuyang Liu for [their tutorial that helped me greatly] in understaning how to use keras with Cloud ML Engine.
+I would like to thank Fuyang Liu for a [tutorial that helped greatly] in understanding how to use keras with Cloud ML Engine.
 
 
 [Cloud ML Engine]: https://cloud.google.com/ml-engine/
