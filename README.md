@@ -2,12 +2,15 @@
 
 ## Keras MNIST MLP
 
-Keras has a wide range of examples on [github]. Let's adapt their [MNIST example]
-that creates a Multi-Layer Perceptron (MLP) model to run on Google's [Cloud ML Engine].
+Keras has a wide range of neural network/deep learning examples on [github]. Let's adapt their [MNIST example] which creates a Multi-Layer Perceptron (MLP) model to run on Google's [Cloud ML Engine].
 
 ### (Optional) Understanding the MNIST MLP example
 
-The [MNIST dataset] is probably the most common dataset used in machine learning examples these days.
+The [MNIST dataset] is probably the most common dataset used in introductory machine learning examples these days. Basically, MNIST is a very high quality dataset that contains thousands of hand-drawn digits like:
+
+![MNIST sample][MNIST sample]
+
+classified by their integer labels "3", "7", etc. The idea is to train a deep (i.e. multi-layered) neural network classifies hand-drawn digits according to their numeric label. The usual implementation of the network outputs the probability that a given digit is in each of the possible digit classes. For example, it's possible the digit is poorly drawn and has a 50% chance to be a "1" and a 50% chance to be a "7".
 
 ```python
 '''Trains a simple deep NN on the MNIST dataset.
@@ -60,7 +63,7 @@ Each 28x28 image is 784 total pixels. There are 60,000 in the training set, and 
 y_train = keras.utils.to_categorical(y_train, num_classes)
 y_test = keras.utils.to_categorical(y_test, num_classes)
 ```
-The original data contains the obvious classes for each hand-drawn digit, e.g. for a hand-drawn "6", the image is classified as the number 6. `to_categorical` changes this classificationi to a vector with a 1 in the 6th entry and 0s otherwise. In this so-called *one-hot encoding*, an output (prediction) vector of the form `[0,0.50,0,0,0,0,0,0.50,0,0]`, for example, means that the hand-drawn digit has a 50% chance to be a 1 and a 50% chance to be a 7.
+The original data contains the obvious classes for each hand-drawn digit, e.g. for a hand-drawn "6", the image is classified as the number 6. `to_categorical` changes this classification to a vector with a 1 in the 6th entry and 0s otherwise. In this so-called *one-hot encoding*, an output (prediction) vector of the form `[0,0.50,0,0,0,0,0,0.50,0,0]`, for example, means that the hand-drawn digit has a 50% chance to be a 1 and a 50% chance to be a 7.
 
 ```python
 model = Sequential()
@@ -186,7 +189,7 @@ Once we're done, the basic project structure will look something like this:
     └── mnist_mlp.py
 ```
 
-### (Preliminaries) Install Google Cloud SDK
+### (Prerequisite) Install Google Cloud SDK
 
 The best way to get started using Cloud ML Engine is to use the tools provided in the [Google Cloud SDK].
 
@@ -393,7 +396,7 @@ gcloud ml-engine local train \
 ```
 *Note*: The order of the options is important. In particular, the extra `--` is required to signal that the options following it should be passed to the module directly at run-time.
 
-To submit a job with Cloud ML Engine:
+To submit a job to Cloud ML Engine:
 ```shell
 gcloud ml-engine jobs submit training $JOB_NAME \
     --job-dir $JOB_DIR \
@@ -411,13 +414,16 @@ You can check the [job status], where logs are also available.
 I would like to thank Fuyang Liu for a [tutorial that helped greatly] in understanding how to use keras with Cloud ML Engine.
 
 
+[BigQuery]: https://cloud.google.com/bigquery/
 [Cloud ML Engine]: https://cloud.google.com/ml-engine/
 [`gcloud ml-engine` documentation]: https://cloud.google.com/sdk/gcloud/reference/ml-engine/
 [github]: https://github.com/fchollet/keras/tree/master/examples
 [Google Cloud SDK]: https://cloud.google.com/sdk/
+[Google Cloud Storage]: https://cloud.google.com/storage/
 [job status]: https://console.cloud.google.com/mlengine/jobs/
 [MNIST dataset]: http://yann.lecun.com/exdb/mnist/
 [MNIST example]: https://github.com/fchollet/keras/blob/master/examples/mnist_mlp.py
+[MNIST sample]: http://myselph.de/mnistExamples.png
 [more general data preparation process]: https://cloud.google.com/ml-engine/docs/concepts/data-prep
 [requires a TensorFlow application to be pre-packaged]: https://cloud.google.com/ml-engine/docs/how-tos/packaging-trainer
 [tutorial that helped greatly]: http://liufuyang.github.io/2017/04/02/just-another-tensorflow-beginner-guide-4.html
