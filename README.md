@@ -411,15 +411,15 @@ You can check the [job status], where logs are also available.
 
 ### (Optional) Hyperparameter tuning
 
-A **hyperparameter** can be thought of as a parameter for a model that is set *before* the model is trained -- contrast this with **weights** and **biases**, which are determined by the training process.
+A **hyperparameter** can be thought of as a parameter for a model that is set *before* the model is trained -- contrast with **weights** and **biases**, which are set *during* the training process.
 
 Cloud ML Engine can do [hyperparameter tuning], i.e. running training multiple times to try to figure out good values for hyperparameters. To make this work, the trainer module has to take in the hyperparameters as arguments.
 
 #### Example: tuning the Dropout layers
 
-The file [mnist_mlp_hpt.py](trainer/mnist_mlp_hpt.py) contains the modified code to accept the `dropout-one` and `dropout-two` hyperparameter arguments.
+The file [mnist_mlp_hpt.py](mnist/trainer/mnist_mlp_hpt.py) contains the modified code to accept the `dropout-one` and `dropout-two` hyperparameter arguments.
 
-Additionally, we need a file `hptuning_config.yaml` that explains what `dropout-one` and `dropout-two` are to the tuner. Basically, these are doubles between `0.1` and `0.5`, which correspond to dropping out 10% to 50% of the incoming parameters from the previous layer. The doubles are chosen to maximize the `accuracy` metric.
+Additionally, we need a file `hptuning_config.yaml` that explains what `dropout-one` and `dropout-two` are to the tuner. Basically, these are doubles between `0.1` and `0.5`, which correspond to dropping out 10% to 50% of the incoming parameters from the previous layer. The doubles are chosen to maximize the `accuracy` metric. `UNIT_REVERSE_LOG_SCALE` is chosen so that it checks values more densely on the bottom end of the range, since the original values were `0.2`. Four trials are run, with a maximum of two running at any given time:
 
 ```yaml
 trainingInput:
