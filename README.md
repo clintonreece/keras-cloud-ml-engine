@@ -291,7 +291,7 @@ import sys
 
 batch_size = 128
 num_classes = 10
-epochs = 2
+epochs = 20
 
 # Create a function to allow for different training data and other options
 def train_model(train_file='data/mnist.pkl',
@@ -409,6 +409,59 @@ gcloud ml-engine jobs submit training $JOB_NAME \
 ```
 You can check the [job status], where logs are also available.
 
+### (Optional) Hyperparameter tuning
+
+A **hyperparameter** can be thought of as a parameter for a model that is set *before* the model is trained -- contrast this with **weights** and **biases**, which are determined by the training process.
+
+Cloud ML Engine can do [hyperparameter tuning], i.e. running training multiple times to try to figure out good values for hyperparameters. To make this work, the trainer module has to take in the hyperparameters as arguments.
+
+#### Example: tuning the Dropout layers
+
+The file [mnist_mlp_hpt.py](trainer/mnist_mlp_hpt.py) contains the modified code to accept the `dropout-one` and `dropout-two` hyperparameter arguments.
+
+Additionally, we need a file `hptuning_config.yaml` that explains what `dropout-one` and `dropout-two` are to the tuner. Basically, these are doubles between `0.1` and `0.5`, which correspond to dropping out 10% to 50% of the incoming parameters from the previous layer. The doubles are chosen to maximize the `accuracy` metric.
+
+```yaml
+trainingInput:
+  hyperparameters:
+    goal: MAXIMIZE
+    hyperparameterMetricTag: accuracy
+    maxTrials: 4
+    maxParallelTrials: 2
+    params:
+      - parameterName: dropout-one
+        type: DOUBLE
+        minValue: 0.1
+        maxValue: 0.5
+        scaleType: UNIT_REVERSE_LOG_SCALE
+      - parameterName: dropout-two
+        type: DOUBLE
+        minValue: 0.1
+        maxValue: 0.5
+        scaleType: UNIT_REVERSE_LOG_SCALE
+```
+
+Some additional options need to be passed to `gcloud`, namely `config` (specifying the hyperparameter config file) and the new hyperparameter arguments `dropout-one` and `dropout-two`:
+```shell
+export BUCKET_NAME=your-bucket-name
+export JOB_NAME="mnist_mlp_hpt_train_$(date +%Y%m%d_%H%M%S)"
+export JOB_DIR=gs://$BUCKET_NAME/$JOB_NAME
+export REGION=us-east1
+export HPTUNING_CONFIG=hptuning_config.yaml
+gcloud ml-engine jobs submit training $JOB_NAME \
+    --job-dir $JOB_DIR \
+    --runtime-version 1.0 \
+    --config $HPTUNING_CONFIG \
+    --module-name trainer.mnist_mlp_hpt \
+    --package-path ./trainer \
+    --region $REGION \
+    -- \
+    --train-file gs://$BUCKET_NAME/data/mnist.pkl \
+    --dropout-one 0.2 \
+    --dropout-two 0.2
+```
+To see the values, check the [job status] which contains the logs and the hyperparameters that Cloud ML Engine found.
+
 #### Acknowledgements
 
 I would like to thank Fuyang Liu for a [tutorial that helped greatly] in understanding how to use keras with Cloud ML Engine.
@@ -420,6 +473,7 @@ I would like to thank Fuyang Liu for a [tutorial that helped greatly] in underst
 [github]: https://github.com/fchollet/keras/tree/master/examples
 [Google Cloud SDK]: https://cloud.google.com/sdk/
 [Google Cloud Storage]: https://cloud.google.com/storage/
+[hyperparameter tuning]: https://cloud.google.com/ml-engine/docs/concepts/hyperparameter-tuning-overview
 [job status]: https://console.cloud.google.com/mlengine/jobs/
 [MNIST dataset]: http://yann.lecun.com/exdb/mnist/
 [MNIST example]: https://github.com/fchollet/keras/blob/master/examples/mnist_mlp.py

@@ -1,0 +1,17 @@
+trainingInput:
+  hyperparameters:
+    goal: MAXIMIZE
+    hyperparameterMetricTag: accuracy
+    maxTrials: 4
+    maxParallelTrials: 2
+    params:
+      - parameterName: dropout-one
+        type: DOUBLE
+        minValue: 0.1
+        maxValue: 0.5
+        scaleType: UNIT_REVERSE_LOG_SCALE
+      - parameterName: dropout-two
+        type: DOUBLE
+        minValue: 0.1
+        maxValue: 0.5
+        scaleType: UNIT_REVERSE_LOG_SCALE
